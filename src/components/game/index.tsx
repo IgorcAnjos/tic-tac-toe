@@ -6,7 +6,6 @@ import { Slot } from './slot';
 
 import { PlayerSet, SlotSet } from './types';
 import { Board } from './board';
-import { useNavigate } from 'react-router-dom';
 
 const winningSequences = [
 	[0, 1, 2],
@@ -76,25 +75,26 @@ const initialSlots: SlotSet[] = [
 	},
 ];
 
+const initialPlayersSet: PlayerSet[] = [
+	{
+		id: 0,
+		name: 'Player 1',
+		simbol: '❌',
+		slotsList: [],
+	},
+	{
+		id: 1,
+		name: 'Player 2',
+		simbol: '⚫',
+		slotsList: [],
+	},
+];
+
 export default function Game() {
-	const navigate = useNavigate();
 	const [move, setMove] = useState<number>(0);
-	const [players, setPlayers] = useState<PlayerSet[]>([
-		{
-			id: 0,
-			name: 'Player 1',
-			simbol: '❌',
-			slotsList: [],
-		},
-		{
-			id: 1,
-			name: 'Player 2',
-			simbol: '⚫',
-			slotsList: [],
-		},
-	]);
+	const [players, setPlayers] = useState<PlayerSet[]>([...initialPlayersSet]);
 	const [currentPlayer, setCurrentPlayer] = useState<PlayerSet>(players[0]);
-	const [slots, setSlots] = useState<SlotSet[]>(initialSlots);
+	const [slots, setSlots] = useState<SlotSet[]>([...initialSlots]);
 	const [canPlay, setCanPlay] = useState<boolean>(true);
 	const [winner, setWinner] = useState<string>('');
 
@@ -148,10 +148,6 @@ export default function Game() {
 		incrementMove();
 	};
 
-	const someFunction = () => {
-		navigate('/', { state: {}, replace: true });
-	};
-
 	const checkFinishGame = () => {
 		const finish = slots.every((slot) => slot.enabled === false);
 		if (finish && canPlay) {
@@ -167,18 +163,29 @@ export default function Game() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [move]);
 
+	// const reset = () => {
+	// 	setSlots([...initialSlots]);
+	// 	setWinner('');
+	// 	setPlayers([...initialPlayersSet]);
+	// 	setCurrentPlayer(players[0]);
+	// 	setCanPlay(true);
+	// 	console.log(initialSlots, initialPlayersSet);
+	// };
+
 	return (
 		<div
 			style={{
 				width: '100%',
 				height: '100vh',
+				overflowY: 'scroll',
+				gap: '1rem',
 				display: 'flex',
 				flexDirection: 'column',
 				justifyContent: 'space-evenly',
 				alignItems: 'center',
 				backgroundColor: '#2E2C2F',
 				margin: 'auto',
-				fontSize: '2vh',
+				fontSize: '1rem',
 				color: '#FFFFFF',
 			}}
 		>
@@ -226,20 +233,21 @@ export default function Game() {
 						key={player.id}
 						style={{
 							display: 'flex',
-							flexDirection: 'column-reverse',
+							flexDirection: 'column',
 							justifyContent: 'space-evenly',
 							alignItems: 'center',
 							backgroundColor: player.id === currentPlayer.id && canPlay ? 'yellowgreen' : 'transparent',
-							height: '5rem',
-							width: '5rem',
-							borderRadius: '50%',
+							borderRadius: '7px',
+							padding: '1rem',
+							width: 'max-content',
 						}}
 					>
+						<p>{player.simbol}</p>
 						<p>{player.name}</p>
-						<p onClick={someFunction}>{player.simbol}</p>
 					</div>
 				))}
 			</DefaultContainer>
+			{/* <button onClick={reset}>RESET</button> */}
 		</div>
 	);
 }
