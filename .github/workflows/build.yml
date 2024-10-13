@@ -1,35 +1,36 @@
-name: Build and Deploy React with Vite to GitHub Pages
+name: Build and Deploy Docker to GitHub Pages
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       # Checkout the repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t my-app .
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
+      # Run Docker container
+      - name: Run Docker container
+        run: docker run --name my-app-container -d my-app
 
-      # Build the project
-      - name: Build project
-        run: npm run build
+      # Copy the build output from the Docker container
+      - name: Copy build output
+        run: docker cp my-app-container:/app/dist ./dist
+
+      # Stop and remove the Docker container
+      - name: Stop and remove container
+        run: |
+          docker stop my-app-container
+          docker rm my-app-container
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
